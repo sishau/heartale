@@ -1,7 +1,7 @@
 """文本转语音文件"""
 
 
-from heartale.tts import TTS
+from tts import TTS
 
 
 class PaddleSpeechTTS(TTS):

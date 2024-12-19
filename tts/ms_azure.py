@@ -1,7 +1,7 @@
 '申请github学生包，然后去微软官网申请，可以免费用一年'
 # https://learn.microsoft.com/zh-cn/azure/ai-services/speech-service/language-support?tabs=tts
 
-from heartale.tts import TTS
+from tts import TTS
 
 
 class AzureTTS(TTS):

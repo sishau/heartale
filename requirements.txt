@@ -1,0 +1,10 @@
+aiohttp
+edge_tts
+gtts
+loguru
+natsort
+ormsgpack
+paddlespeech
+pydantic
+torch
+

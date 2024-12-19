@@ -1,8 +1,8 @@
 '统计阅读时间'
 from datetime import datetime
 
-from heartale.tools import get_data, save_data
-from heartale.tools.config import PATH_CONFIG_DIR
+from tools import get_data, save_data
+from tools.config import PATH_CONFIG_DIR
 
 PATH_READ_TIME = f"{PATH_CONFIG_DIR}/read_time.json"
 

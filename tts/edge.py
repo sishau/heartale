@@ -1,8 +1,8 @@
 """文本转语音文件"""
 
 
-from heartale.tools import get_proxy_url
-from heartale.tts import TTS
+from tools import get_proxy_url
+from tts import TTS
 
 
 class EdgeTTS(TTS):

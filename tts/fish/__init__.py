@@ -1,6 +1,6 @@
 """fish speech"""
 
-from heartale.tts import TTS
+from tts import TTS
 
 
 class FishTTS(TTS):
@@ -15,8 +15,8 @@ class FishTTS(TTS):
     def set_conf(self, conf, py_libs=None):
         super().set_conf(conf, [])
         # pylint: disable=C0415
-        from heartale.tts.fish.commons import ServeReferenceAudio
-        from heartale.tts.fish.file import audio_to_bytes, read_ref_text
+        from tts.fish.commons import ServeReferenceAudio
+        from tts.fish.file import audio_to_bytes, read_ref_text
 
         references = []
         for a, t in self.conf.get("audio_text", {}).items():
@@ -51,7 +51,7 @@ class FishTTS(TTS):
         # audio_text = {
         #     "/home/yuh/a13.mp3": "英老头一指点去，他的身躯突然炸开，四分五裂，元神被斩 ，死于非命。其他诸多神族心中悚然，急忙各自后退。"
         # }
-        from heartale.tts.fish.commons import ServeTTSRequest
+        from tts.fish.commons import ServeTTSRequest
         self.data["text"] = text
         async with aiohttp.ClientSession() as session:
             async with session.post(

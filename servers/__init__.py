@@ -1,6 +1,6 @@
 '''获取文本并自动跳转的配置'''
 
-from heartale.tools import split_text
+from tools import split_text
 
 
 class BookData():

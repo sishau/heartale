@@ -3,7 +3,7 @@
 
 import re
 
-from heartale.tts import TTS
+from tts import TTS
 
 
 class CoquiTTS(TTS):

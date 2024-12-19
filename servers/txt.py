@@ -3,10 +3,10 @@ import os
 import pathlib
 from datetime import datetime
 
-from heartale.servers import BookData, Server
-from heartale.tools import (cal_file_md5, detect_encoding, get_data,
+from servers import BookData, Server
+from tools import (cal_file_md5, detect_encoding, get_data,
                             parse_volumes_and_chapters, save_data)
-from heartale.tools.config import PATH_CONFIG_DIR
+from tools.config import PATH_CONFIG_DIR
 
 PATH_FILE = "path_file"
 # 第几章

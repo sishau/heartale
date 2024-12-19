@@ -1,9 +1,9 @@
 """配置"""
 import os
 
-from heartale.tools import get_data, save_data
+from tools import get_data, save_data
 
-PATH_CONFIG_DIR = f'{os.getenv("HOME")}/.config/heartale/'
+PATH_CONFIG_DIR = f'config/'
 os.makedirs(PATH_CONFIG_DIR, exist_ok=True)
 
 PATH_CONFIG = f'{PATH_CONFIG_DIR}/config.json'

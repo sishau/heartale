@@ -4,13 +4,13 @@ import os
 import time
 from datetime import datetime
 
-from heartale.servers import Server
-from heartale.tools.cache import get_cache_mp3, rm_cache_mp3
-from heartale.tools.config import (get_config, get_config_server,
+from servers import Server
+from tools.cache import get_cache_mp3, rm_cache_mp3
+from tools.config import (get_config, get_config_server,
                                    get_config_tts_download)
-from heartale.tools.constant import get_servers, get_ttses
-from heartale.tools.count import save_read_time
-from heartale.tts import TTS, play_mp3
+from tools.constant import get_servers, get_ttses
+from tools.count import save_read_time
+from tts import TTS, play_mp3
 
 
 def get_server(conf_all) -> Server:
@@ -75,8 +75,8 @@ async def play(chap=1000, play_min=100):
     """主函数，两个条件只要满足一个就停止
 
     Args:
-        chap (int, optional): 默认听1000段落，自动停止. Defaults to 1000.
-        play_min (int, optional): 默认播放100分钟，读完当前章节自动停止. Defaults to 100.
+        chap (int, optional): 默认听1000段落, 自动停止. Defaults to 1000.
+        play_min (int, optional): 默认播放100分钟, 读完当前章节自动停止. Defaults to 100.
     """
     # https://github.com/gedoor/legado
     # 获取当前第一本书的信息
@@ -137,6 +137,6 @@ async def play(chap=1000, play_min=100):
         await asyncio.gather(task_play, task_download)
 
 
-def run_play():
+if __name__ == '__main__':
     """运行主函数"""
     asyncio.run(play())

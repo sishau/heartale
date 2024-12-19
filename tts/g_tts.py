@@ -1,7 +1,7 @@
 """不推荐，很机器人"""
 
 
-from heartale.tts import TTS
+from tts import TTS
 
 
 class GTTS(TTS):

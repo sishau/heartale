@@ -3,8 +3,8 @@ import asyncio
 import copy
 import os
 
-from heartale.tools import check_library_installed
-from heartale.tools.config import get_config_tts_play
+from tools import check_library_installed
+from tools.config import get_config_tts_play
 
 
 class TTS:

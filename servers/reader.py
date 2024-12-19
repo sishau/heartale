@@ -5,8 +5,8 @@ import time
 
 import aiohttp
 
-from heartale.servers import BookData, Server
-from heartale.tools import data2url
+from servers import BookData, Server
+from tools import data2url
 
 # 常量定义
 CHAP_POS = "durChapterPos"
@@ -24,7 +24,7 @@ def get_base_url(conf):
     Returns:
         str: _description_
     """
-    return f'http://{conf["ip"]}:{conf["port"]}'
+    return f'http://{conf["ip"]}:{conf["port"]}/reader3'
 
 
 def bu(book_data: dict):
@@ -39,20 +39,20 @@ def bu(book_data: dict):
     return f'url={data2url(book_data["bookUrl"])}'
 
 
-class LegadoServer(Server):
+class ReaderServer(Server):
     """阅读app相关的webapi"""
 
     def __init__(self):
         """初始化应用API
 
         Args:
-            conf (dict): 配置 conf["legado"]
+            conf (dict): 配置 conf["reader"]
         """
         # 书籍信息
         self.book_data = {}
         self.bd = BookData()
 
-        super().__init__("legado")
+        super().__init__("reader")
 
     async def initialize(self):
 

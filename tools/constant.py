@@ -1,12 +1,13 @@
 '常量'
-from heartale.servers.legado import LegadoServer
-from heartale.servers.txt import TxtServer
-from heartale.tts.coqui import CoquiTTS
-from heartale.tts.edge import EdgeTTS
-from heartale.tts.fish import FishTTS
-from heartale.tts.g_tts import GTTS
-from heartale.tts.ms_azure import AzureTTS
-from heartale.tts.paddle_speech import PaddleSpeechTTS
+from servers.legado import LegadoServer
+from servers.txt import TxtServer
+from servers.reader import ReaderServer
+from tts.coqui import CoquiTTS
+from tts.edge import EdgeTTS
+from tts.fish import FishTTS
+from tts.g_tts import GTTS
+from tts.ms_azure import AzureTTS
+from tts.paddle_speech import PaddleSpeechTTS
 
 
 def get_servers():
@@ -19,6 +20,7 @@ def get_servers():
     return [
         LegadoServer(),
         TxtServer(),
+        ReaderServer(),
     ]
 
 

@@ -10,7 +10,7 @@ def get_cache_path():
     Returns:
         _type_: _description_
     """
-    return os.getenv("HOME") + "/.cache/bpy/"
+    return ".cache/bpy/"
 
 
 os.makedirs(get_cache_path(), exist_ok=True)
