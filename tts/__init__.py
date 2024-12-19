@@ -52,6 +52,7 @@ async def play_mp3(file_path, conf_all: dict):
     """
 
     codes = copy.copy(get_config_tts_play(conf_all)["code"])
+    file_path = os.path.abspath(file_path)
     codes.append(file_path)
 
     process = await asyncio.create_subprocess_exec(*codes)

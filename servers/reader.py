@@ -105,7 +105,9 @@ class ReaderServer(Server):
             async with session.get(url, timeout=10) as response:
                 resp_json = await response.json(content_type=None)
 
-        return resp_json["data"][book_n]
+        data = resp_json["data"]
+        data.sort(key=lambda x: x["durChapterTime"], reverse=True)
+        return data[book_n]
 
     async def _get_chapter_list(self, book_data: dict):
         """异步获取书章节目录
@@ -174,5 +176,5 @@ class ReaderServer(Server):
                                     timeout=10) as response:
                 resp_json = await response.json(content_type=None)
 
-                if not resp_json["isSuccess"]:
-                    raise ValueError(f'进度保存错误！\n{resp_json["errorMsg"]}')
+                # if not resp_json["isSuccess"]:
+                #     raise ValueError(f'进度保存错误！\n{resp_json["errorMsg"]}')

@@ -19,32 +19,16 @@
     "tts": {
         "play": {
             "code": [
-              "paplay"
+              "cmdmp3"
 	    ]
         },
         "download": {
-            "key": "edge",
-            "edge": {
+            "key": "docker",
+            "docker": {
+                "ip": "127.0.0.1",
+                "port": "18081",
                 "voice": "zh-CN-XiaoxiaoNeural",
-                "rate": "+30%"
-            },
-            "azure": {
-                "key": "",
-                "region": "japanwest",
-                "language": "zh-CN",
-                "voice": "zh-CN-XiaoxiaoNeural",
-                "rate": "+30%"
-            },
-            "gtts": {
-                "language": "zh-CN"
-            },
-            "coqui": {
-                "model": "tts_models/zh-CN/baker/tacotron2-DDC-GST"
-            },
-            "paddlespeech": {},
-            "fish": {
-                "url_tts": "http://127.0.0.1:8080/v1/tts",
-                "audio_text": {}
+                "rate": "20"
             }
         }
     }
