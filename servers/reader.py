@@ -178,5 +178,4 @@ class ReaderServer(Server):
                 resp_json = await response.json(content_type=None)
 
                 if not resp_json["isSuccess"]:
-                    print(f"{resp_json}")
                     raise ValueError(f'进度保存错误！\n{resp_json["errorMsg"]}')
