@@ -3,6 +3,7 @@ from servers.legado import LegadoServer
 from servers.txt import TxtServer
 from servers.reader import ReaderServer
 from tts.docker_tts import dockerTTS
+from tts.coqui import CoquiTTS
 
 def get_servers():
     """获取所有服务
@@ -26,5 +27,6 @@ def get_ttses():
     """
 
     return [
-        dockerTTS()
+        dockerTTS(),
+        CoquiTTS()
     ]

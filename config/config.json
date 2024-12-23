@@ -23,12 +23,15 @@
 	    ]
         },
         "download": {
-            "key": "docker",
-            "docker": {
+            "key": "edge",
+            "edge": {
                 "ip": "127.0.0.1",
                 "port": "18081",
                 "voice": "zh-CN-XiaoxiaoNeural",
                 "rate": "30"
+            },
+            "coqui": {
+                "model": "C:\\Software\\reader\\sherpa\\model"
             }
         }
     }

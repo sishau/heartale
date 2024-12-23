@@ -9,7 +9,7 @@ class dockerTTS(TTS):
     def __init__(self):
         self.com = None
         self.proxy = None
-        super().__init__("docker")
+        super().__init__("edge")
 
     def set_conf(self, conf):
         self.conf = conf
