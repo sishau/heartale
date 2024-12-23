@@ -19,7 +19,7 @@
     "tts": {
         "play": {
             "code": [
-              "cmdmp3"
+              "C:\\Software\\reader\\cmdmp3\\cmdmp3.exe"
 	    ]
         },
         "download": {
@@ -28,7 +28,7 @@
                 "ip": "127.0.0.1",
                 "port": "18081",
                 "voice": "zh-CN-XiaoxiaoNeural",
-                "rate": "20"
+                "rate": "30"
             }
         }
     }
