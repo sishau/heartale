@@ -158,6 +158,8 @@ class ReaderServer(Server):
 
         # 构建请求数据
         data = {
+            "url": book_data["bookUrl"],
+            "index": book_data[CHAP_INDEX],
             "name": self.book_name,
             "author": book_data["author"],
             CHAP_INDEX: self.bd.chap_n,
@@ -168,7 +170,6 @@ class ReaderServer(Server):
 
         json_data = json.dumps(data)
         headers = {'Content-Type': 'application/json'}
-
         async with aiohttp.ClientSession() as session:
             async with session.post(f"{get_base_url(self.conf)}/saveBookProgress",
                                     data=json_data,
@@ -176,5 +177,6 @@ class ReaderServer(Server):
                                     timeout=10) as response:
                 resp_json = await response.json(content_type=None)
 
-                # if not resp_json["isSuccess"]:
-                #     raise ValueError(f'进度保存错误！\n{resp_json["errorMsg"]}')
+                if not resp_json["isSuccess"]:
+                    print(f"{resp_json}")
+                    raise ValueError(f'进度保存错误！\n{resp_json["errorMsg"]}')

@@ -23,7 +23,7 @@
 	    ]
         },
         "download": {
-            "key": "edge",
+            "key": "sherpa",
             "edge": {
                 "ip": "127.0.0.1",
                 "port": "18081",
@@ -32,6 +32,12 @@
             },
             "coqui": {
                 "model": "C:\\Software\\reader\\sherpa\\model"
+            },
+            "sherpa": {
+                "ip": "127.0.0.1",
+                "port": "18082",
+                "sid": 0,
+                "speed": 1.2
             }
         }
     }
