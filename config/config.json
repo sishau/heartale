@@ -1,11 +1,15 @@
 {
     "version": 1,
     "proxy_url": "",
+    "max_time": {
+        "chap": 100,
+        "min": 10
+    },
     "server": {
-        "key": "reader",
+        "key": "legado",
         "legado": {
-            "ip": "192.168.1.6",
-            "port": "2121"
+            "ip": "192.168.1.176",
+            "port": "1122"
         },
         "txt": {
             "path_file": "/tmp/temp.txt",
@@ -17,11 +21,6 @@
         }
     },
     "tts": {
-        "play": {
-            "code": [
-              "C:\\Software\\reader\\cmdmp3\\cmdmp3.exe"
-	    ]
-        },
         "download": {
             "key": "sherpa",
             "edge": {
@@ -30,12 +29,9 @@
                 "voice": "zh-CN-XiaoxiaoNeural",
                 "rate": "30"
             },
-            "coqui": {
-                "model": "C:\\Software\\reader\\sherpa\\model"
-            },
             "sherpa": {
                 "ip": "127.0.0.1",
-                "port": "18082",
+                "port": "8080",
                 "sid": 0,
                 "speed": 1.2
             }

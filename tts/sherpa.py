@@ -16,11 +16,9 @@ class sherpa(TTS):
         self.url = f"http://{self.conf['ip']}:{self.conf['port']}/tts"
         self.data = {"sid": self.conf.get("sid", "0"), "speed": self.conf.get("speed", "1.0")}
 
-    async def download(self, text, file):
+    async def download(self, text):
         self.data["text"] = text
         async with aiohttp.ClientSession() as session:
-            async with session.post(self.url, json=self.data, timeout=10) as response:
+            async with session.post(self.url, json=self.data, timeout=30) as response:
                 mp3_file = await response.read()
-        with open(file, "wb") as f:
-            f.write(mp3_file)
-        return True
+        return mp3_file

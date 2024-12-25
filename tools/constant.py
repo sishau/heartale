@@ -3,7 +3,6 @@ from servers.legado import LegadoServer
 from servers.txt import TxtServer
 from servers.reader import ReaderServer
 from tts.docker_tts import dockerTTS
-from tts.coqui import CoquiTTS
 from tts.sherpa import sherpa
 
 def get_servers():
@@ -29,6 +28,5 @@ def get_ttses():
 
     return [
         dockerTTS(),
-        CoquiTTS(),
         sherpa()
     ]

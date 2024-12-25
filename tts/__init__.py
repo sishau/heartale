@@ -1,11 +1,9 @@
 """文字转语音"""
 import asyncio
-import copy
-import os
-
+import sounddevice as sd
+import soundfile as sf
+import io
 from tools import check_library_installed
-from tools.config import get_config_tts_play
-
 
 class TTS:
     """获取待阅读文本的基础类
@@ -22,7 +20,7 @@ class TTS:
         self.conf = None
 
     def set_conf(self, conf, py_libs=None):
-        """设置配置信息，并可以初始化一些服务，比如import第三方库，防止未使用的TTS导致内存占用过大
+        """设置配置信息, 并可以初始化一些服务, 比如import第三方库, 防止未使用的TTS导致内存占用过大
 
         Args:
             conf (dict): 配置信息
@@ -37,24 +35,25 @@ class TTS:
                 if not check_library_installed(py_lib):
                     raise ImportError(f"请安装{py_lib}库: pip install {py_lib}")
 
-    async def download(self, text, file):
+    async def download(self, text):
         """下载
         """
-        print(text, file)
+        return text
 
+    def play_audio(self, audio_data):
+        audio, simple_rate = sf.read(io.BytesIO(audio_data), dtype='int16')
+        device_index = sd.default.device[1]
+        with sd.OutputStream(device=device_index, channels=1, samplerate=simple_rate, blocksize=1024):
+            sd.play(audio, device=device_index, samplerate=simple_rate)
+            sd.wait()
 
-async def play_mp3(file_path, conf_all: dict):
-    """子线程阅读
+    async def play_mp3(self, audio_data, executor):
+        """子线程朗读
 
-    Args:
-        file_path (str): 音频文件路径
-        conf_all (dict): 所有配置
-    """
+        Args:
+            audio_data (str): 音频数据
+            executor (ThreadPoolExecutor): 线程池
+        """
 
-    codes = copy.copy(get_config_tts_play(conf_all)["code"])
-    file_path = os.path.abspath(file_path)
-    codes.append(file_path)
-
-    process = await asyncio.create_subprocess_exec(*codes)
-    await process.communicate()
-    os.remove(file_path)
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(executor, self.play_audio, audio_data)

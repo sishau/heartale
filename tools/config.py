@@ -14,6 +14,10 @@ CONFIG_DATA = None
 DEFAULT_CONFIG = {
     "version": 1,
     "proxy_url": "",
+    "max_time": {
+        "chap": 1000,
+        "min": 100
+    },
     "server": {
         "key": "txt",
         "legado": {
@@ -103,20 +107,6 @@ def get_config_server(conf_all):
 
     return conf_server_key, conf_server
 
-
-def get_config_tts_play(conf_all):
-    """获取tts配置
-
-    Args:
-        conf_all (dict): 配置数据
-
-    Returns:
-        dict: tts配置
-    """
-
-    return conf_all["tts"]["play"]
-
-
 def get_config_tts_download(conf_all):
     """获取tts配置
 
@@ -131,3 +121,18 @@ def get_config_tts_download(conf_all):
     conf_tts_key = conf_ttss["key"]
     conf_tts = conf_ttss[conf_tts_key]
     return conf_tts_key, conf_tts
+
+
+def get_config_max_time(conf_all):
+    """获取最大朗读时间配置
+        两个条件只要满足一个就停止
+    Args:
+        conf_all (dict): 配置数据
+
+    Returns:
+        dict: 最大时间配置
+    """
+    conf_max_time = conf_all["max_time"]
+    conf_max_chap = conf_max_time["chap"]
+    conf_max_minutes = conf_max_time["min"]
+    return conf_max_chap, conf_max_minutes
