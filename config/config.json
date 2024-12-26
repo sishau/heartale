@@ -19,7 +19,7 @@
     "tts": {
         "play": {
             "code": [
-              "C:\\Software\\reader\\cmdmp3\\cmdmp3.exe"
+              "C:\\Software\\reader\\cmdmp3.exe"
 	    ]
         },
         "download": {

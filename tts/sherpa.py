@@ -19,7 +19,7 @@ class sherpa(TTS):
     async def download(self, text, file):
         self.data["text"] = text
         async with aiohttp.ClientSession() as session:
-            async with session.post(self.url, json=self.data, timeout=10) as response:
+            async with session.post(self.url, json=self.data, timeout=20) as response:
                 mp3_file = await response.read()
         with open(file, "wb") as f:
             f.write(mp3_file)
