@@ -1,0 +1,7 @@
+model_folder: ./models/sherpa-onnx-vits-zh-ll
+model: model.onnx
+lexicon: lexicon.txt
+dict_dir: dict
+tokens: tokens.txt
+rule_fsts: phone.fst, number.fst, date.fst, new_heteronym.fst
+

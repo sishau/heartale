@@ -2,11 +2,11 @@
     "version": 1,
     "proxy_url": "",
     "max_time": {
-        "chap": 100,
+        "chap": 20,
         "min": 10
     },
     "server": {
-        "key": "legado",
+        "key": "reader",
         "legado": {
             "ip": "192.168.1.176",
             "port": "1122"
@@ -16,8 +16,8 @@
             "encoding": ""
         },
         "reader": {
-            "ip": "127.0.0.1",
-            "port": "18080"
+            "ip": "reader",
+            "port": "8080"
         }
     },
     "tts": {
@@ -30,10 +30,10 @@
                 "rate": "30"
             },
             "sherpa": {
-                "ip": "127.0.0.1",
+                "ip": "sherpa-tts-1",
                 "port": "8080",
-                "sid": 0,
-                "speed": 1.2
+                "sid": 2,
+                "speed": 1.4
             }
         }
     }

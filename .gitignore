@@ -108,4 +108,6 @@ venv.bak/
 .mypy_cache/
 main2.py
 read_book2
-config/read_time.json
+read_time.json
+models/
+storage/
