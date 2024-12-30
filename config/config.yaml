@@ -1,0 +1,26 @@
+version: 1.0.0
+proxy: None
+max_time: 10
+max_chapter: 20
+server:
+  key: reader
+  legado:
+    ip: 192.168.1.176
+    port: 1122
+  text:
+    path: /tmp/temp.txt
+    encoding: utf-8
+  reader:
+    ip: 127.0.0.1
+    port: 18080
+tts:
+  key: sherpa
+  edge:
+    ip: 127.0.0.1
+    port: 18081
+    voice: zh-CN-XiaoxiaoNeural
+    rate: 30
+  sherpa:
+    model_config: ./config/model.yaml
+    sid: 2
+    speed: 1.4
