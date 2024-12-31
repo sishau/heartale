@@ -23,6 +23,6 @@ handlers:
     encoding: utf-8
 loggers:
   main:
-    level: INFO
+    level: DEBUG
     handlers: [console, file]
     propagate: false

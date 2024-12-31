@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 class BookData:
     def __init__(self):
         # 章节目录
@@ -16,7 +19,7 @@ class BookData:
         self.chap_txt_n = 0
 
     def set_chap_names(self, chap_names, chap_n, chap_p2s=None):
-        
+
         self.chap_names = chap_names
         self.chap_n = chap_n
         self.chap_p2s = chap_p2s
