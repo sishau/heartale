@@ -10,6 +10,7 @@ class legado:
         self.base_url = None
         self.cur_chapter_index = 0
         self.cur_chapter_pos = 0
+        self.base_url = "http://{}:{}".format(self.conf['host'], self.conf['port'])
 
     def __del__(self):
         self.save_book_progress()
@@ -71,8 +72,7 @@ class legado:
             logger.error(f"Failed to get book content from server. Status code: {response.status_code}")
 
     def initialize(self):
-        self.book_data = None
-        self.base_url = "http://{}:{}".format(self.conf['host'], self.conf['port'])
+        self.book_data = None        
         book_info = self._get_book_info()
         if not book_info:
             raise Exception("Failed to get book info from server.")
@@ -110,9 +110,10 @@ class legado:
             "durChapterTime": curTimeStamp
         }
         logger.info(f"Saving book progress: {data}")
-        response = requests.get(url, json=data, timeout=10)
+        response = requests.post(url, json=data, timeout=10)
         if response.status_code != 200:
             logger.error(f"Failed to save book progress. Status code: {response.status_code}")
+        logger.info(f"response: {response.content}")
         book_info = self._get_book_info()
         logger.info(f"After book save progress: chapter_index={book_info['durChapterIndex']}, chapter_pos={book_info['durChapterPos']}")
 
