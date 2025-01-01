@@ -1,0 +1,15 @@
+services:
+  tts:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: heartale:dev
+    container_name: heartale-dev
+    ports:
+      - 18081:8080
+    volumes:
+      - .:/app
+      - ./logs:/logs
+    restart: on-failure
+    environment:
+      - TZ=Asia/Shanghai

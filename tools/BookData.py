@@ -1,26 +1,42 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from .logger import logger
 class BookData:
-    def __init__(self):
-        # 章节目录
-        self.chap_names = []
-        # 章节目录所在位置
-        self.chap_p2s = []
-        # 这次是从第几个章节开始读的
-        self.chap_n0 = 0
-        # 现在是第几个章节
-        self.chap_n = 0
-        # 某章节的文本分割
-        self.chap_txts = []
-        # 某章节的文本分割所在位置
-        self.chap_txt_p2s = [0]
-        # 某章节的文本分割位置
-        self.chap_txt_n = 0
+    def __init__(self, book_info: dict):
+        self.name = book_info["name"]
+        self.author = book_info["author"]
+        self.bookUrl = book_info["bookUrl"]
+        self.lastChapterIndex = book_info["durChapterIndex"]
+        self.lastChapterPos = book_info["durChapterPos"]
+        self.lastChapterTitle = book_info["durChapterTitle"]
+        self.chapterList = []
+        self.len_limit = 100
 
-    def set_chap_names(self, chap_names, chap_n, chap_p2s=None):
+    def get_title_by_index(self, index: int) -> str:
+        if index < 0 or index >= len(self.chapterList):
+            return ""
+        return self.chapterList[index]
 
-        self.chap_names = chap_names
-        self.chap_n = chap_n
-        self.chap_p2s = chap_p2s
-
+    def split_text(self, text: str, chap_index: int= 0, position: int=0) -> list:
+        result = [
+            {
+                "text": f"{self.name}...{self.chapterList[chap_index]}",
+                "chapterIndex": chap_index,
+                "position": position
+            }
+        ]
+        cur_pos = 0
+        this_line = ""
+        for line in text.strip().split("\n"):
+            cur_pos += len(line)
+            if cur_pos < position:
+                continue            
+            this_line += line.strip()
+            if len(this_line) > self.len_limit:
+                result.append({"text": this_line, "chapterIndex": chap_index, "position": cur_pos})
+                this_line = ""
+                if self.len_limit < 500:
+                    self.len_limit += 10
+        if this_line:
+            result.append({"text": this_line, "chapterIndex": chap_index, "position": cur_pos})
+        return result

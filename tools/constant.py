@@ -4,7 +4,7 @@
 import os
 import sys
 import yaml
-import importlib
+import importlib.util
 
 project_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -23,5 +23,5 @@ def import_from_file(folder, module_name):
 server_name = config['server']['key']
 SERVER = import_from_file('server', server_name)
 
-# tts_name = config['tts']['key']
-# TTS = import_from_file('tts', tts_name)
+tts_name = config['tts']['key']
+TTS = import_from_file('tts', tts_name)
