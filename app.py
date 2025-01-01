@@ -47,12 +47,10 @@ def tts():
 def save():
     index = int(request.args.get('index', None))
     position = int(request.args.get('pos', None))
-    app.logger.info("save index before: {}, position: {}".format(index, position))
     global cur_index, cur_pos
     if index is None or position is None:
         index = cur_index
         position = cur_pos
-    app.logger.info("save index after: {}, position: {}".format(index, position))
     SERVER.save_book_progress(index, position)
     return Response("success", status=200)
 

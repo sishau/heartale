@@ -22,5 +22,5 @@ tts:
     rate: 30
   sherpa:
     model_config: ./models/config.yaml
-    sid: 2
+    sid: 0
     speed: 1.4

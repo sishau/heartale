@@ -91,8 +91,6 @@ class legado:
         Args:
             chapter_index (int): the index of the chapter to save.
         """        
-        logger.info(f"Before book save progress: chapter_index={self.cur_chapter_index}, chapter_pos={self.cur_chapter_pos}")
-        logger.info(f"save parameters: chapter_index={chapter_index}, chapter_pos={chapter_pos}")
         url = f"{self.base_url}/saveBookProgress"
         curTimeStamp = int(time.time() * 1000)
         if chapter_index is None:
@@ -100,7 +98,6 @@ class legado:
         if chapter_pos is None:
             chapter_pos = self.cur_chapter_pos
         chapter_title = self.book_data.get_title_by_index(chapter_index)
-        logger.info(f"Saving book progress: chapter_index={chapter_index}, chapter_pos={chapter_pos}")
         data = {
             "name": self.book_data.name,
             "author": self.book_data.author,
@@ -109,24 +106,21 @@ class legado:
             "durChapterTitle": chapter_title,
             "durChapterTime": curTimeStamp
         }
-        logger.info(f"Saving book progress: {data}")
         response = requests.post(url, json=data, timeout=10)
         if response.status_code != 200:
             logger.error(f"Failed to save book progress. Status code: {response.status_code}")
-        logger.info(f"response: {response.content}")
-        book_info = self._get_book_info()
-        logger.info(f"After book save progress: chapter_index={book_info['durChapterIndex']}, chapter_pos={book_info['durChapterPos']}")
 
     def GenText(self):
         """Go to the next data to read.
         """
         while True:
             chapter_content = self._get_book_content(self.cur_chapter_index)
-            logger.info(f"Reading chapter {self.cur_chapter_index+1}: {self.book_data.get_title_by_index(self.cur_chapter_index)}, length: {len(chapter_content)}")
+            logger.info(f"Generating text from chapter {self.book_data.get_title_by_index(self.cur_chapter_index)}")
             if not chapter_content:
                 logger.error("Failed to get book content from server.")
             text_list = self.book_data.split_text(chapter_content, self.cur_chapter_index, self.cur_chapter_pos)
             for text in text_list:
+                logger.info(f"Yielding {len(text["text"])} characters of text.")
                 yield text
             self.cur_chapter_index += 1
             self.cur_chapter_pos = 0

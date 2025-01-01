@@ -53,7 +53,6 @@ class sherpa:
         audio = self.tts_server.generate(text, sid=sid, speed=speed)
         if audio is None:
             return None
-        logger.info(f"Generated audio of length {len(audio.samples)}")
         buffer = io.BytesIO()
         sf.write(buffer, audio.samples, samplerate=audio.sample_rate, format="WAV")
         buffer.seek(0)
