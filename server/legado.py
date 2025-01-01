@@ -72,7 +72,7 @@ class legado:
             logger.error(f"Failed to get book content from server. Status code: {response.status_code}")
 
     def initialize(self):
-        self.book_data = None        
+        self.book_data = None
         book_info = self._get_book_info()
         if not book_info:
             raise Exception("Failed to get book info from server.")
@@ -90,11 +90,11 @@ class legado:
 
         Args:
             chapter_index (int): the index of the chapter to save.
-        """        
+        """
         url = f"{self.base_url}/saveBookProgress"
         curTimeStamp = int(time.time() * 1000)
         if chapter_index is None:
-            chapter_index = self.cur_chapter_index        
+            chapter_index = self.cur_chapter_index
         if chapter_pos is None:
             chapter_pos = self.cur_chapter_pos
         chapter_title = self.book_data.get_title_by_index(chapter_index)
