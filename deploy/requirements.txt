@@ -1,6 +1,0 @@
-pyyaml
-requests
-numpy
-sherpa_onnx
-soundfile
-flask

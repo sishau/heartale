@@ -3,7 +3,7 @@ proxy: None
 max_time: 10
 max_chapter: 20
 server:
-  key: legado
+  key: reader
   legado:
     host: 192.168.1.176
     port: 1122
@@ -11,8 +11,8 @@ server:
     path: /tmp/temp.txt
     encoding: utf-8
   reader:
-    host: 127.0.0.1
-    port: 18080
+    host: reader
+    port: 8080
 tts:
   key: sherpa
   edge:

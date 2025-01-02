@@ -1,15 +1,47 @@
 services:
+  reader:
+    image: hectorqin/reader
+    container_name: reader #容器名 可自行修改
+    restart: on-failure
+    ports:
+      - 18080:8080 #4396端口映射可自行修改
+    networks:
+      - reader_net
+    volumes:
+      - ./logs:/logs #log映射目录 /home/reader/logs 映射目录可自行修改
+      - ./storage:/storage #数据映射目录 /home/reader/storage 映射目录可自行修改
+      - /tmp/cache:/storage/cache #缓存目录映射 可自行修改
+    environment:
+      - TZ=Asia/Shanghai
+      - SPRING_PROFILES_ACTIVE=prod
+      - READER_APP_USERLIMIT=50 #用户上限,默认50
+      - READER_APP_USERBOOKLIMIT=200 #用户书籍上限,默认200
+      - READER_APP_CACHECHAPTERCONTENT=true #开启缓存章节内容 V2.0
+      # 下面都是多用户模式配置
+      - READER_APP_SECURE=false #开启登录鉴权，开启后将支持多用户模式
+      - READER_APP_SECUREKEY=adminpwd  #管理员密码  建议修改
+      - READER_APP_INVITECODE=registercode #注册邀请码 建议修改,如不需要可注释或删除
   tts:
     build:
       context: .
       dockerfile: Dockerfile
-    image: heartale:dev
-    container_name: heartale-dev
+    image: heartale
+    container_name: heartale
     ports:
       - 18081:8080
+    networks:
+      - reader_net
     volumes:
-      - .:/app
+      - ./config:/app/config
+      - ./models:/app/models
       - ./logs:/logs
     restart: on-failure
     environment:
       - TZ=Asia/Shanghai
+    depends_on:
+      - reader
+    entrypoint: ["sh", "-c", "sleep 10 && python app.py"]
+
+networks:
+  reader_net:
+    driver: bridge
