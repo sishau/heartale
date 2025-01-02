@@ -15,7 +15,7 @@ def t_get_text(q):
     gen = SERVER.GenText()
     while True:
         gen_text = next(gen)
-        text = gen_text["text"]    
+        text = gen_text["text"]
         gen_text["audio"] = TTS.synthesize(text)
         q.put(gen_text)
 
@@ -33,8 +33,9 @@ def tts():
     gen_audio = q.get()
     audio = gen_audio["audio"]
     index = gen_audio["chapterIndex"]
-    position = gen_audio["position"]   
+    position = gen_audio["position"]
 
+    app.logger.debug("reading  index: {}, position: {}".format(index, position))
     global cur_index, cur_pos
     if index != cur_index:
         SERVER.save_book_progress(index, position)

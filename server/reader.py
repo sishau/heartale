@@ -37,7 +37,7 @@ class reader(legado):
         url = f"{self.base_url}/saveBookProgress"
         curTimeStamp = int(time.time() * 1000)
         if chapter_index is None:
-            chapter_index = self.cur_chapter_index        
+            chapter_index = self.cur_chapter_index
         if chapter_pos is None:
             chapter_pos = self.cur_chapter_pos
         chapter_title = self.book_data.get_title_by_index(chapter_index)
@@ -51,6 +51,7 @@ class reader(legado):
             "durChapterTitle": chapter_title,
             "durChapterTime": curTimeStamp
         }
-        response = requests.get(url, json=data, timeout=10)
+        logger.debug(f"Save book progress, index: {chapter_index}, pos: {chapter_pos}, title: {chapter_title}")
+        response = requests.post(url, json=data, timeout=10)
         if response.status_code != 200:
             logger.error(f"Failed to save book progress. Status code: {response.status_code}")
