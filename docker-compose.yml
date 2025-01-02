@@ -40,7 +40,7 @@ services:
       - TZ=Asia/Shanghai
     depends_on:
       - reader
-    entrypoint: ["sh", "-c", "sleep 10 && python app.py"]
+    entrypoint: ["sh", "-c", "sleep 5 && python app.py"]
 
 networks:
   reader_net:

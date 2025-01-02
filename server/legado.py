@@ -120,7 +120,7 @@ class legado:
                 logger.error("Failed to get book content from server.")
             text_list = self.book_data.split_text(chapter_content, self.cur_chapter_index, self.cur_chapter_pos)
             for text in text_list:
-                logger.info(f"Yielding {len(text["text"])} characters of text.")
+                logger.debug(f"Yielding {len(text["text"])} characters of text.")
                 yield text
             self.cur_chapter_index += 1
             self.cur_chapter_pos = 0
