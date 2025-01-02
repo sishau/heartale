@@ -3,7 +3,7 @@ proxy: None
 max_time: 10
 max_chapter: 20
 server:
-  key: reader
+  key: legado
   legado:
     host: 192.168.1.176
     port: 1122
