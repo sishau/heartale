@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>音频播放器</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <audio controls id="audioPlayer">
+        <source src="" type="audio/wav">
+        您的浏览器不支持音频元素。
+    </audio>
+    <input type="checkbox" id="textSync" onchange="setTextSync()">同步显示文本
+    <div id="displayText"></div>
+
+    <script>
+        var socket = io();
+        var audioPlayer = document.getElementById('audioPlayer');
+
+        function setTextSync() {
+            var checkbox = document.getElementById('textSync');
+            socket.emit('text_sync', checkbox.checked);
+        }
+
+        socket.on('connect', function() {
+            socket.emit('request_next_audio');
+        });
+
+        socket.on('audio_data', function(data) {
+            var binaryString = atob(data.audio_base64);
+            var len = binaryString.length;
+            var bytes = new Uint8Array(len);
+            for (var i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            var blob = new Blob([bytes], { type: 'audio/wav' });
+            var audioUrl = URL.createObjectURL(blob);
+            audioPlayer.src = audioUrl;
+            audioPlayer.load();            
+        });
+
+        audioPlayer.addEventListener('ended', function() {
+            socket.emit('request_next_audio');
+            audioPlayer.play();
+        });
+
+
+
+        socket.on('text_data', function(text) {
+            var displayText = document.getElementById('displayText');
+            displayText.textContent = text;
+        });
+
+        socket.on('disconnect', function() {
+            if (!audioElement.ended) {
+                socket.emit('disconnect');
+            }
+        });
+    </script>
+</body>
+</html>

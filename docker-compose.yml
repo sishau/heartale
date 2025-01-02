@@ -7,8 +7,6 @@ services:
     container_name: heartale
     ports:
       - 18081:8080
-    networks:
-      - reader_net
     volumes:
       - .:/app
       - ./logs:/logs

@@ -2,12 +2,12 @@ FROM python:3.12.4-slim-bookworm
 
 WORKDIR /app
 
-COPY . /deploy/debian.sources /etc/apt/sources.list.d/debian.sources
+COPY ./deploy/debian.sources /etc/apt/sources.list.d/debian.sources
 
 RUN apt update -y && apt upgrade -y \
     && apt install -y --no-install-recommends \
         tar curl bzip2 \
-    && pip install flask pyyaml numpy soundfile sherpa-onnx requests\
+    && pip install flask pyyaml numpy soundfile sherpa-onnx requests flask_socketio \
         -i https://pypi.tuna.tsinghua.edu.cn/simple \
     && rm -rf /var/lib/apt/lists/*
 
