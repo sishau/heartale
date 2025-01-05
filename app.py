@@ -11,7 +11,7 @@ from flask_socketio import SocketIO, emit
 from tools.constant import *
 from tools import logger
 
-q = Queue(maxsize=3)
+q = Queue(maxsize=5)
 qlock = threading.Lock()
 cur_index = 0
 cur_pos = 0
@@ -26,7 +26,7 @@ def t_get_text(q: Queue):
     while True:
         gen_text = next(gen)
         text = gen_text["text"]
-        gen_text["audio"] = TTS.synthesize(text).read()
+        gen_text["audio"] = TTS.synthesize(text)
         q.put(gen_text)
 
 app = Flask(__name__)
@@ -44,7 +44,7 @@ def request_next_audio():
     text = cur_audio["text"]
     index = cur_audio["chapterIndex"]
     position = cur_audio["position"]
-    logger.info(f"Sending audio {index} {position} {text}")
+    logger.debug(f"Sending audio chapter{index} position{position}")
 
     if index != cur_index:
         SERVER.save_book_progress(index, position)
@@ -72,6 +72,21 @@ def handle_text_sync(checked):
 @app.route('/index')
 def index():
     return render_template('index.html')
+
+@app.route('/tts')
+def tts():
+    global cur_index, cur_pos, cur_audio
+    cur_audio = q.get()
+    audio = cur_audio["audio"]
+    index = cur_audio["chapterIndex"]
+    position = cur_audio["position"]
+    logger.debug(f"TTS audio chapter{index} position{position}")
+
+    if index != cur_index:
+        SERVER.save_book_progress(index, position)
+    cur_index = index
+    cur_pos = position
+    return Response(audio, mimetype='audio/wav')
 
 @app.route('/save', methods=['GET', 'POST'])
 def save():

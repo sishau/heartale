@@ -56,6 +56,6 @@ class sherpa:
         buffer = io.BytesIO()
         sf.write(buffer, audio.samples, samplerate=audio.sample_rate, format="WAV")
         buffer.seek(0)
-        return buffer
+        return buffer.read()
 
 

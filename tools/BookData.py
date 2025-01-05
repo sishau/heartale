@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from .logger import logger
+import re
+
 class BookData:
     def __init__(self, book_info: dict):
         self.name = book_info["name"]
@@ -10,7 +12,6 @@ class BookData:
         self.lastChapterPos = book_info["durChapterPos"]
         self.lastChapterTitle = book_info["durChapterTitle"]
         self.chapterList = []
-        self.len_limit = 100
 
     def get_title_by_index(self, index: int) -> str:
         if index < 0 or index >= len(self.chapterList):
@@ -26,17 +27,9 @@ class BookData:
             }
         ]
         cur_pos = 0
-        this_line = ""
         for line in text.strip().split("\n"):
             cur_pos += len(line)
             if cur_pos < position:
-                continue            
-            this_line += line.strip()
-            if len(this_line) > self.len_limit:
-                result.append({"text": this_line, "chapterIndex": chap_index, "position": cur_pos})
-                this_line = ""
-                if self.len_limit < 500:
-                    self.len_limit += 10
-        if this_line:
-            result.append({"text": this_line, "chapterIndex": chap_index, "position": cur_pos})
+                continue
+            result.append({"text": re.sub(r'\s','', line), "chapterIndex": chap_index, "position": cur_pos})
         return result
