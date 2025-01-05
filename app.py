@@ -4,33 +4,30 @@
 import time
 import threading
 import base64
-from collections import deque
+from queue import Queue
 from flask import Flask, request, Response, render_template, session
 from flask_socketio import SocketIO, emit
 
 from tools.constant import *
 from tools import logger
 
-q = deque(maxlen=4)
+q = Queue(maxsize=3)
 qlock = threading.Lock()
 cur_index = 0
 cur_pos = 0
 cur_audio = None
 
-def t_get_text(q: deque):
+def t_get_text(q: Queue):
     SERVER.initialize()
     logger.info("Server initialized")
     TTS.initialize()
     logger.info("TTS initialized")
     gen = SERVER.GenText()
     while True:
-        while len(q) == (q.maxlen-1):
-            time.sleep(1)
         gen_text = next(gen)
         text = gen_text["text"]
-        gen_text["audio"] = TTS.synthesize(text)
-        with qlock:
-            q.append(gen_text)
+        gen_text["audio"] = TTS.synthesize(text).read()
+        q.put(gen_text)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '~heartale!'
@@ -42,9 +39,7 @@ t.start()
 def request_next_audio():
     global cur_index, cur_pos, cur_audio
     app.logger.info("request_next_audio")
-    while len(q) == 0:
-        time.sleep(1)
-    cur_audio = q.popleft()
+    cur_audio = q.get()
     audio = cur_audio["audio"]
     text = cur_audio["text"]
     index = cur_audio["chapterIndex"]
@@ -56,7 +51,7 @@ def request_next_audio():
     cur_index = index
     cur_pos = position
 
-    audio_data = base64.b64encode(audio.read()).decode('utf-8')
+    audio_data = base64.b64encode(audio).decode('utf-8')
     emit("audio_data", {'audio_base64': audio_data})
     if session.get('text_sync', False):
         emit("text_data", text)
@@ -67,8 +62,7 @@ def handle_connect():
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    with qlock:
-        q.appendleft(cur_audio)
+    q.queue.appendleft(cur_audio)
     app.logger.info('Client disconnected')
 
 @socketio.on('text_sync')

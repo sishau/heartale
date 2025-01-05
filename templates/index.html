@@ -36,12 +36,12 @@
             var blob = new Blob([bytes], { type: 'audio/wav' });
             var audioUrl = URL.createObjectURL(blob);
             audioPlayer.src = audioUrl;
-            audioPlayer.load();            
+            audioPlayer.load();
+            audioPlayer.play();
         });
 
         audioPlayer.addEventListener('ended', function() {
             socket.emit('request_next_audio');
-            audioPlayer.play();
         });
 
 
