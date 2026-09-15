@@ -37,6 +37,11 @@
         function setTextSync() {
             localStorage.setItem('textSync', textSyncEl.checked ? '1' : '0');
             socket.emit('text_sync', textSyncEl.checked);
+            if (textSyncEl.checked && currentItem && currentItem.text) {
+                document.getElementById('displayText').textContent = currentItem.text;
+            } else if (!textSyncEl.checked) {
+                document.getElementById('displayText').textContent = '';
+            }
         }
 
         function requestIfNeeded() {
@@ -55,12 +60,16 @@
             bookEnded = false;
             audioPlayer.removeAttribute('src');
             audioPlayer.load();
+            document.getElementById('displayText').textContent = '';
         }
 
         function playNext() {
             if (playing || currentItem !== null || buffer.length === 0) return;
             currentItem = buffer.shift();
             playing = true;
+            if (textSyncEl.checked && currentItem.text) {
+                document.getElementById('displayText').textContent = currentItem.text;
+            }
             var url = URL.createObjectURL(currentItem.blob);
             audioPlayer.src = url;
             var p = audioPlayer.play();
@@ -111,7 +120,8 @@
             buffer.push({
                 blob: blob,
                 chapterIndex: data.chapterIndex,
-                position: data.position
+                position: data.position,
+                text: data.text
             });
             statusEl.textContent = '播放中 · 第' + (data.chapterIndex + 1) + '章';
             playNext();

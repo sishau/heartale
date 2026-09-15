@@ -81,9 +81,8 @@ def request_next_audio():
         "chapterIndex": gen_text["chapterIndex"],
         "position": gen_text["position"],
         "audio": gen_text["audio"],
+        "text": gen_text["text"],
     })
-    if session.get('text_sync', False):
-        emit("text_data", gen_text["text"])
 
 
 @socketio.on('chunk_played')
