@@ -1,26 +1,13 @@
-version: 1.0.0
-proxy: None
-max_time: 10
-max_chapter: 20
 server:
-  key: legado
-  legado:
-    host: 192.168.1.170
-    port: 1122
-  text:
-    path: /tmp/temp.txt
-    encoding: utf-8
-  reader:
-    host: reader
-    port: 8080
+  path: /home/john/workspace/heartale/storage/text/temp.txt
+  encoding: utf-8
 tts:
-  key: sherpa
-  edge:
-    host: 127.0.0.1
-    port: 18081
-    voice: zh-CN-XiaoxiaoNeural
-    rate: 30
-  sherpa:
-    model_config: ./models/config.yaml
-    sid: 0
-    speed: 1.2
+  model_folder: ./models/matcha-icefall-zh-baker
+  model: model-steps-3.onnx
+  vocoder: hifigan_v2.onnx
+  lexicon: lexicon.txt
+  dict_dir: dict
+  tokens: tokens.txt
+  rule_fsts: phone.fst, number.fst, date.fst
+  sid: 0
+  speed: 1.4

@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-#! -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
+import io
 import os
-import yaml
+
 import sherpa_onnx
 import soundfile as sf
-import io
-from tools import logger
 
-project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class sherpa:
     def __init__(self, conf):
@@ -16,26 +14,28 @@ class sherpa:
         self.tts_server = None
 
     def initialize(self):
-        model_config = yaml.safe_load(open(os.path.join(project_dir, self.conf['model_config']), "r"))
-        # model_dir = os.path.join(project_dir, model_config['model_folder'])
-        model_dir = model_config.get("model_folder", "./models")
-        if "rule_fsts" in model_config:
-            rule_fsts = [os.path.join(model_dir, rule_fst.strip()) for rule_fst in model_config["rule_fsts"].split(",")]
-            rule_fsts = ",".join(rule_fsts)
-        else:
-            rule_fsts = ""
-        model_config = {key:os.path.join(model_dir, value) for key, value in model_config.items() if key not in ("model_folder", "rule_fsts")}
+        conf = self.conf
+        model_dir = conf['model_folder']
+        model_config = {
+            'model': os.path.join(model_dir, conf['model']),
+            'vocoder': os.path.join(model_dir, conf['vocoder']),
+            'tokens': os.path.join(model_dir, conf['tokens']),
+            'dict_dir': os.path.join(model_dir, conf['dict_dir']),
+        }
+        lexicon = ",".join(os.path.join(model_dir, item.strip()) for item in conf['lexicon'].split(','))
+        rule_fsts = ",".join(os.path.join(model_dir, item.strip()) for item in conf['rule_fsts'].split(','))
 
+        matcha = sherpa_onnx.OfflineTtsMatchaModelConfig(
+            acoustic_model=model_config['model'],
+            vocoder=model_config['vocoder'],
+            lexicon=lexicon,
+            tokens=model_config['tokens'],
+            data_dir="",
+            dict_dir=model_config['dict_dir'],
+        )
         tts_config = sherpa_onnx.OfflineTtsConfig(
             model=sherpa_onnx.OfflineTtsModelConfig(
-                vits=sherpa_onnx.OfflineTtsVitsModelConfig(
-                    model=model_config.get("model", "./models/model.onnx"),
-                    lexicon=model_config.get("lexicon", ""),
-                    data_dir=model_config.get("data_dir", ""),
-                    dict_dir=model_config.get("dict_dir", ""),
-                    tokens=model_config.get("tokens", "./models/tokens.txt")
-                ),
-                matcha=sherpa_onnx.OfflineTtsMatchaModelConfig(),
+                matcha=matcha,
                 provider="cpu",
                 debug=False,
                 num_threads=1,
@@ -57,5 +57,3 @@ class sherpa:
         sf.write(buffer, audio.samples, samplerate=audio.sample_rate, format="WAV")
         buffer.seek(0)
         return buffer.read()
-
-
