@@ -2,59 +2,130 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>音频播放器</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="/static/vendor/socket.io.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 720px; margin: 0 auto; padding: 16px; }
+        #status { font-size: 13px; color: #666; margin: 10px 0; }
+        #displayText { white-space: pre-wrap; line-height: 1.6; }
+    </style>
 </head>
 <body>
-    <audio controls id="audioPlayer">
-        <source src="" type="audio/wav">
-        您的浏览器不支持音频元素。
-    </audio>
-    <input type="checkbox" id="textSync" onchange="setTextSync()">同步显示文本
+    <audio controls id="audioPlayer"></audio>
+    <div id="status">连接中...</div>
+    <label><input type="checkbox" id="textSync">同步显示文本</label>
     <div id="displayText"></div>
 
     <script>
         var socket = io();
         var audioPlayer = document.getElementById('audioPlayer');
+        var statusEl = document.getElementById('status');
+        var textSyncEl = document.getElementById('textSync');
+
+        var MAX_BUFFER = 2;
+        var buffer = [];          // 已接收、待播放的块
+        var pendingRequests = 0;  // 在途请求数, 精确限制预取总量
+        var currentItem = null;   // 当前装载在播放器中的块
+        var playing = false;
+        var bookEnded = false;
+
+        // 记住文本同步开关
+        textSyncEl.checked = localStorage.getItem('textSync') === '1';
+        textSyncEl.addEventListener('change', setTextSync);
 
         function setTextSync() {
-            var checkbox = document.getElementById('textSync');
-            socket.emit('text_sync', checkbox.checked);
+            localStorage.setItem('textSync', textSyncEl.checked ? '1' : '0');
+            socket.emit('text_sync', textSyncEl.checked);
         }
 
-        socket.on('connect', function() {
-            socket.emit('request_next_audio');
-        });
-
-        socket.on('audio_data', function(data) {
-            var binaryString = atob(data.audio_base64);
-            var len = binaryString.length;
-            var bytes = new Uint8Array(len);
-            for (var i = 0; i < len; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
+        function requestIfNeeded() {
+            if (bookEnded) return;
+            while (buffer.length + pendingRequests < MAX_BUFFER) {
+                pendingRequests++;
+                socket.emit('request_next_audio');
             }
-            var blob = new Blob([bytes], { type: 'audio/wav' });
-            var audioUrl = URL.createObjectURL(blob);
-            audioPlayer.src = audioUrl;
+        }
+
+        function resetState() {
+            buffer = [];
+            pendingRequests = 0;
+            currentItem = null;
+            playing = false;
+            bookEnded = false;
+            audioPlayer.removeAttribute('src');
             audioPlayer.load();
-            audioPlayer.play();
-        });
+        }
+
+        function playNext() {
+            if (playing || currentItem !== null || buffer.length === 0) return;
+            currentItem = buffer.shift();
+            playing = true;
+            var url = URL.createObjectURL(currentItem.blob);
+            audioPlayer.src = url;
+            var p = audioPlayer.play();
+            if (p && p.catch) {
+                p.catch(function() {
+                    // 自动播放被浏览器拦截: 块已装载, 等待用户点击播放
+                    playing = false;
+                });
+            }
+        }
 
         audioPlayer.addEventListener('ended', function() {
-            socket.emit('request_next_audio');
+            if (!currentItem) return;
+            URL.revokeObjectURL(audioPlayer.src);
+            socket.emit('chunk_played', {
+                chapterIndex: currentItem.chapterIndex,
+                position: currentItem.position
+            });
+            currentItem = null;
+            playing = false;
+            playNext();
+            requestIfNeeded();
         });
 
+        audioPlayer.addEventListener('error', function() {
+            // 解码失败: 跳过该块(不回报进度, 避免跳读)
+            currentItem = null;
+            playing = false;
+            playNext();
+            requestIfNeeded();
+        });
 
-
-        socket.on('text_data', function(text) {
-            var displayText = document.getElementById('displayText');
-            displayText.textContent = text;
+        socket.on('connect', function() {
+            statusEl.textContent = '已连接';
+            resetState();
+            requestIfNeeded();
         });
 
         socket.on('disconnect', function() {
-            if (!audioElement.ended) {
-                socket.emit('disconnect');
-            }
+            statusEl.textContent = '连接已断开, 重连中...';
+        });
+
+        socket.on('audio_data', function(data) {
+            pendingRequests--;
+            var blob = data.audio instanceof Blob
+                ? data.audio
+                : new Blob([data.audio], { type: 'audio/wav' });
+            buffer.push({
+                blob: blob,
+                chapterIndex: data.chapterIndex,
+                position: data.position
+            });
+            statusEl.textContent = '播放中 · 第' + (data.chapterIndex + 1) + '章';
+            playNext();
+            requestIfNeeded();
+        });
+
+        socket.on('audio_end', function() {
+            bookEnded = true;
+            pendingRequests = 0;
+            statusEl.textContent = '全书朗读完毕';
+        });
+
+        socket.on('text_data', function(text) {
+            document.getElementById('displayText').textContent = text;
         });
     </script>
 </body>

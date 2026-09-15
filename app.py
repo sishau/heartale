@@ -1,104 +1,126 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import time
-import threading
-import base64
-from queue import Queue
+import os
+import yaml
 from flask import Flask, request, Response, render_template, session
 from flask_socketio import SocketIO, emit
 
-from tools.constant import *
+from server.text import text
+from tts.sherpa import sherpa
 from tools import logger
 
-q = Queue(maxsize=5)
-qlock = threading.Lock()
-cur_index = 0
-cur_pos = 0
-cur_audio = None
+project_folder = os.path.dirname(os.path.abspath(__file__))
 
-def t_get_text(q: Queue):
-    SERVER.initialize()
-    logger.info("Server initialized")
-    TTS.initialize()
-    logger.info("TTS initialized")
-    gen = SERVER.GenText()
-    while True:
-        gen_text = next(gen)
-        text = gen_text["text"]
-        gen_text["audio"] = TTS.synthesize(text)
-        q.put(gen_text)
+with open(os.path.join(project_folder, 'config', 'config.yaml'), 'r', encoding='utf-8') as f:
+    config = yaml.safe_load(f)
+
+SERVER = text(config['server'])
+TTS = sherpa(config['tts'])
+
+SERVER.initialize()
+logger.info("Server initialized")
+TTS.initialize()
+logger.info("TTS initialized")
+
+# Independent HTTP /tts stream (not shared with socket sessions)
+tts_gen = SERVER.GenText()
+
+# Per-socket-connection text generator (keyed by request.sid)
+session_gens = {}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '~heartale!'
 socketio = SocketIO(app)
-t = threading.Thread(target=t_get_text, args=(q,))
-t.start()
+
+
+def _next_audio(gen):
+    """Pull one text chunk from the generator and synthesize it. Returns None on end/failure."""
+    try:
+        gen_text = next(gen)
+    except StopIteration:
+        return None
+    gen_text["audio"] = TTS.synthesize(gen_text["text"])
+    if gen_text["audio"] is None:
+        logger.error("TTS returned empty audio, skip")
+        return None
+    return gen_text
+
+
+def _session_gen():
+    sid = request.sid
+    gen = session_gens.get(sid)
+    if gen is None:
+        gen = SERVER.GenText()
+        session_gens[sid] = gen
+    return gen
+
 
 @socketio.on('request_next_audio')
 def request_next_audio():
-    global cur_index, cur_pos, cur_audio
-    app.logger.info("request_next_audio")
-    cur_audio = q.get()
-    audio = cur_audio["audio"]
-    text = cur_audio["text"]
-    index = cur_audio["chapterIndex"]
-    position = cur_audio["position"]
-    logger.debug(f"Sending audio chapter{index} position{position}")
-
-    if index != cur_index:
-        SERVER.save_book_progress(index, position)
-    cur_index = index
-    cur_pos = position
-
-    audio_data = base64.b64encode(audio).decode('utf-8')
-    emit("audio_data", {'audio_base64': audio_data})
+    gen_text = _next_audio(_session_gen())
+    if gen_text is None:
+        emit("audio_end")
+        return
+    logger.debug(f"Sending audio chapter{gen_text['chapterIndex']} position{gen_text['position']}")
+    emit("audio_data", {
+        "chapterIndex": gen_text["chapterIndex"],
+        "position": gen_text["position"],
+        "audio": gen_text["audio"],
+    })
     if session.get('text_sync', False):
-        emit("text_data", text)
+        emit("text_data", gen_text["text"])
+
+
+@socketio.on('chunk_played')
+def handle_chunk_played(data):
+    SERVER.save_book_progress(data["chapterIndex"], data["position"])
+    logger.debug(f"Progress saved chapter{data['chapterIndex']} position{data['position']}")
+
 
 @socketio.on('connect')
 def handle_connect():
     app.logger.info('Client connected')
 
+
 @socketio.on('disconnect')
 def handle_disconnect():
-    q.queue.appendleft(cur_audio)
+    session_gens.pop(request.sid, None)
+    SERVER.flush_progress()
     app.logger.info('Client disconnected')
+
 
 @socketio.on('text_sync')
 def handle_text_sync(checked):
     session['text_sync'] = checked
+    if not checked:
+        emit("text_data", "")
+
 
 @app.route('/index')
 def index():
     return render_template('index.html')
 
+
 @app.route('/tts')
 def tts():
-    global cur_index, cur_pos, cur_audio
-    cur_audio = q.get()
-    audio = cur_audio["audio"]
-    index = cur_audio["chapterIndex"]
-    position = cur_audio["position"]
-    logger.debug(f"TTS audio chapter{index} position{position}")
+    global tts_gen
+    gen_text = _next_audio(tts_gen)
+    if gen_text is None:
+        return Response(status=204)
+    logger.debug(f"TTS audio chapter{gen_text['chapterIndex']} position{gen_text['position']}")
+    SERVER.save_book_progress(gen_text["chapterIndex"], gen_text["position"])
+    return Response(gen_text["audio"], mimetype='audio/wav')
 
-    if index != cur_index:
-        SERVER.save_book_progress(index, position)
-    cur_index = index
-    cur_pos = position
-    return Response(audio, mimetype='audio/wav')
 
 @app.route('/save', methods=['GET', 'POST'])
 def save():
-    index = int(request.args.get('index', None))
-    position = int(request.args.get('pos', None))
-    global cur_index, cur_pos
-    if index is None or position is None:
-        index = cur_index
-        position = cur_pos
-    SERVER.save_book_progress(index, position)
+    index = request.args.get('index')
+    position = request.args.get('pos')
+    if index is not None and position is not None:
+        SERVER.save_book_progress(int(index), int(position))
     return Response("success", status=200)
 
+
 if __name__ == '__main__':
-    socketio.run(app, debug=False, host='0.0.0.0', port=8080, allow_unsafe_werkzeug=True)
-    # app.run(debug=False, host='0.0.0.0', port=8080)
+    socketio.run(app, debug=False, host='0.0.0.0', port=28081, allow_unsafe_werkzeug=True)
