@@ -23,7 +23,7 @@ class text:
         self.save_path = "./logs"
         self.encoding = self.conf.get("encoding", "utf-8")
         self._last_progress_write = 0.0
-        self._progress_write_interval = 10.0
+        self._progress_write_interval = 600.0
         atexit.register(self._save_on_exit)
 
     def _save_on_exit(self):
@@ -112,7 +112,7 @@ class text:
     def initialize(self):
         if "path" not in self.conf:
             raise Exception("请设置待阅读的txt文件所在路径")
-        self.file_path = self.conf["path"]
+        self.file_path = os.path.expanduser(self.conf["path"])
         logger.info(f"文件位置：{self.file_path}")
         if not os.path.exists(self.file_path):
             raise Exception("路径错误，文件不存在")

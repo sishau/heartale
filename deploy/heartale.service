@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=john
-WorkingDirectory=/home/john/workspace/heartale
-ExecStart=/home/john/workspace/heartale/venv/bin/python /home/john/workspace/heartale/app.py
+User=your_username
+WorkingDirectory=%h/workspace/heartale
+ExecStart=%h/workspace/heartale/venv/bin/python %h/workspace/heartale/app.py
 Restart=on-failure
 RestartSec=5
 

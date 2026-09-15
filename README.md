@@ -7,7 +7,7 @@
 - **txt 文本源**：本地指定一个 txt 文件，自动解析「第X卷 / 第X章」章节结构
 - **sherpa-onnx TTS**：Matcha-TTS 中文模型离线合成，不依赖任何在线 API
 - **客户端驱动流式播放**：浏览器主动按需拉取音频块，服务端边合成边推送（二进制 WAV）
-- **播放进度自动保存**：按「实际播放完成」回报进度，断线/退出自动落盘；磁盘写入节流（默认 10s）
+- **播放进度自动保存**：按「实际播放完成」回报进度，断线/退出自动落盘；磁盘写入节流（默认 10 分钟）
 - **预取缓冲**：客户端最多预取 2 个音频块，保证连续播放、避免卡顿
 - **文本同步显示**：可选边听边看当前文本
 - **多端并发**：每个浏览器连接独立的阅读游标，互不干扰
@@ -80,7 +80,7 @@ pip install -r requirements.txt
 
 ```yaml
 server:
-  path: /home/john/workspace/heartale/storage/text/temp.txt  # 待阅读的 txt 文件绝对路径
+  path: ~/workspace/heartale/storage/text/temp.txt  # 待阅读的 txt 文件路径（~ 会自动展开）
   encoding: utf-8
 tts:
   model_folder: ./models/matcha-icefall-zh-baker  # 模型目录（相对项目根）
@@ -105,7 +105,7 @@ python app.py
 
 ## 部署（systemd）
 
-内网长期运行推荐注册为 systemd 服务：
+内网长期运行推荐注册为 systemd 服务。先将 `deploy/heartale.service` 中的 `User=your_username` 改为你的实际用户名（`%h` 会自动展开为对应家目录），然后：
 
 ```bash
 sudo cp deploy/heartale.service /etc/systemd/system/
@@ -128,5 +128,5 @@ sudo ufw allow 28081/tcp
 ## 说明
 
 - 进度文件保存在 `logs/text_<md5>.json`，按书籍 md5 区分，记录章/节位置
-- 进度磁盘写入默认节流 10 秒；断连或进程退出时强制落盘
+- 进度磁盘写入默认节流 10 分钟；断连或进程退出时强制落盘
 - 每个浏览器会话拥有独立阅读游标，刷新页面从各自上次位置继续
