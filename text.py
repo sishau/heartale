@@ -6,12 +6,10 @@ import hashlib
 import json
 import os
 import re
-import sys
 import time
 from pathlib import Path
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from tools import logger
+from logger import logger
 
 
 class text:

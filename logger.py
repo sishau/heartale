@@ -7,7 +7,7 @@ import os
 import yaml
 from datetime import datetime
 
-project_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+project_folder = os.path.dirname(os.path.abspath(__file__))
 logger_folder = os.path.join(project_folder, 'logs')
 if not os.path.exists(logger_folder):
     os.makedirs(logger_folder)

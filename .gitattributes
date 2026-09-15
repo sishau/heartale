@@ -1,4 +1,2 @@
 config/config.yaml merge=ours
-tools/logger.py merge=ours
-docker-compose.yml merge=ours
-Dockerfile merge=ours
+config/logger.yaml merge=ours

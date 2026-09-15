@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import os
+import threading
 import yaml
 from flask import Flask, request, Response, render_template, session
 from flask_socketio import SocketIO, emit
 
-from server.text import text
-from tts.sherpa import sherpa
-from tools import logger
+from text import text
+from sherpa import sherpa
+from logger import logger
 
 project_folder = os.path.dirname(os.path.abspath(__file__))
 
@@ -28,6 +29,9 @@ tts_gen = SERVER.GenText()
 
 # Per-socket-connection text generator (keyed by request.sid)
 session_gens = {}
+
+# Serialize generator advancement per session (socketio handles events in threads)
+session_locks = {}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '~heartale!'
@@ -56,9 +60,19 @@ def _session_gen():
     return gen
 
 
+def _session_lock():
+    sid = request.sid
+    lock = session_locks.get(sid)
+    if lock is None:
+        lock = threading.Lock()
+        session_locks[sid] = lock
+    return lock
+
+
 @socketio.on('request_next_audio')
 def request_next_audio():
-    gen_text = _next_audio(_session_gen())
+    with _session_lock():
+        gen_text = _next_audio(_session_gen())
     if gen_text is None:
         emit("audio_end")
         return
@@ -86,6 +100,7 @@ def handle_connect():
 @socketio.on('disconnect')
 def handle_disconnect():
     session_gens.pop(request.sid, None)
+    session_locks.pop(request.sid, None)
     SERVER.flush_progress()
     app.logger.info('Client disconnected')
 

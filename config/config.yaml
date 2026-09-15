@@ -10,4 +10,4 @@ tts:
   tokens: tokens.txt
   rule_fsts: phone.fst, number.fst, date.fst
   sid: 0
-  speed: 1.4
+  speed: 1.3
