@@ -1,0 +1,14 @@
+[Unit]
+Description=Heartale TTS audiobook web service
+After=network.target
+
+[Service]
+Type=simple
+User=john
+WorkingDirectory=/home/john/workspace/heartale
+ExecStart=/home/john/workspace/heartale/venv/bin/python /home/john/workspace/heartale/app.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
