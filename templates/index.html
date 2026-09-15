@@ -23,7 +23,7 @@
         var statusEl = document.getElementById('status');
         var textSyncEl = document.getElementById('textSync');
 
-        var MAX_BUFFER = 2;
+        var MAX_BUFFER = 3;
         var buffer = [];          // 已接收、待播放的块
         var pendingRequests = 0;  // 在途请求数, 精确限制预取总量
         var currentItem = null;   // 当前装载在播放器中的块
