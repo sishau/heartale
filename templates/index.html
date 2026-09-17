@@ -94,6 +94,22 @@
             requestIfNeeded();
         });
 
+        // 暂停/切走页面时也上报进度, 避免中途暂停后重载丢进度
+        function reportProgress() {
+            if (currentItem) {
+                socket.emit('chunk_played', {
+                    chapterIndex: currentItem.chapterIndex,
+                    position: currentItem.position
+                });
+            }
+        }
+        audioPlayer.addEventListener('pause', reportProgress);
+        window.addEventListener('pagehide', reportProgress);
+        window.addEventListener('beforeunload', reportProgress);
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) reportProgress();
+        });
+
         audioPlayer.addEventListener('error', function() {
             // 解码失败: 跳过该块(不回报进度, 避免跳读)
             currentItem = null;

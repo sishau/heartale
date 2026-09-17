@@ -142,8 +142,10 @@ class text:
     def save_book_progress(self, chapter_index=None, chapter_pos=None, force=False):
         if chapter_index is not None:
             self.book_conf["durChapterIndex"] = chapter_index
+            self.cur_chapter_index = chapter_index
         if chapter_pos is not None:
             self.book_conf["durChapterPos"] = chapter_pos
+            self.cur_chapter_pos = chapter_pos
         now = time.time()
         if not force and now - self._last_progress_write < self._progress_write_interval:
             return
